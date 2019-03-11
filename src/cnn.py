@@ -20,7 +20,7 @@ class CNN:
         self.CNN_LAYERS.append(layer)
 
     # Trainning process contains the forward and backward function
-    def train(trainData,trainLabel,batch_size,iteration):
+    def train(trainData,trainLabel,batch_size,epoch=10000):
         return -1
 
     # Perform the forward operation for all the layers
