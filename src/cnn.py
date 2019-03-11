@@ -12,7 +12,7 @@ import random
 
 class CNN:
     def __init__(self):
-        self.NAME = CNN
+        self.NAME = "CNN"
         self.CNN_LAYERS = []
     
     # Appedn a new layer into the current CNN layers
