@@ -2,6 +2,7 @@ import os
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
+import time
 
 print(tf.__version__)
 
@@ -30,12 +31,18 @@ reverse_word_index = dict([(value, key) for (key, value) in word_index.items()])
 
 def encode_review(text):
     for i in range(len(text)):
-        text[i] = word_index[text[i].lower()]
+        if(text[i].lower() in word_index):
+            text[i] = word_index[text[i].lower()]
+        else:
+            text[i] = 0
     return text
 
 def decode_review(text):
     for i in range(len(text)):
-        text[i] = reverse_word_index[text[i]]
+        if(text[i] in reverse_word_index):
+            text[i] = reverse_word_index[text[i]]
+        else:
+            text[i] = "UNK!!"
     return text
 
 def get_list(data_dirctory):
@@ -61,20 +68,26 @@ def padding(words, size=256):
 def get_review(file_name):
     with open(file_name) as f:
         content = f.readlines()
-    print(content[0])
+    #print(content[0])
     review = content[0].split()
 
     for i in range(len(review)):
-        if(not review[i].isalpha()):
-            review[i] = review[i][0:len(review[i])-1]
-    #print(review)
+        pos = len(review[i])
+        for c in range(len(review[i])):
+            if(not review[i][c].isalpha()):
+                pos = c
+                break
+        review[i] = review[i][0:pos]
+
+    #sprint(review)
     review = encode_review(review)
-    print(np.shape(review))
+    #print(np.shape(review))
     review = padding(review)
-    print(np.shape(review))
-    print (review)
+    #print(np.shape(review))
+    #print (review)
     review = embedding_words(review)
-    print(np.shape(review))
+    #print(np.shape(review))
+    return review
 
 def get_data(data_dirctory):
     train_data = []
@@ -82,13 +95,26 @@ def get_data(data_dirctory):
     lists = get_list(data_dirctory)
     for filename in lists:
         #extract file name from
-        tmp = filename.split('-')
+        print("OPen file {}".format(filename))
+        tmp = filename.split('_')
         tmp = tmp[1].split('.')
         train_label.append(int(tmp[0]))
-        review_vector = get_review(filename)
+        review_vector = get_review(data_dirctory+filename)
         train_data.append(review_vector)
-    print(train_data.shape)
+        
+    #print(train_data.shape)
     return train_data, train_label
 
-get_review(train_data_dir_neg+"0_3.txt")
+def train_dataset():
+    start_time = time.time()
+    
+    neg_train_data, neg_train_label = get_data(train_data_dir_neg)
+    #pos_train_data, pos_train_label = get_data(train_data_dir_pos)
+    print(np.shape(neg_train_data))
+    print(np.shape(neg_train_label))
+    elapsed_time = time.time() - start_time
+    print("It took {} to finish this shit".format(elapsed_time))
 
+#get_review(train_data_dir_neg+"0_3.txt")
+
+#train_dataset()
