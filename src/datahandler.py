@@ -3,12 +3,15 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import time
+import random
 
 print(tf.__version__)
 
 words_dict = "../imdb_data/imdb.vocab"
 train_data_dir_neg = "../imdb_data/train/neg/"
 train_data_dir_pos = "../imdb_data/train/pos/"
+test_data_dir_neg = "../imdb_data/test/neg/"
+test_data_dir_pos = "../imdb_data/test/pos/"
 
 # Handling data
 #   Load the dictionary from words_dict
@@ -82,12 +85,11 @@ def get_review(file_name):
     #sprint(review)
     review = encode_review(review)
     #print(np.shape(review))
-    review = padding(review)
+    #review = padding(review)
     #print(np.shape(review))
     #print (review)
-    review = embedding_words(review)
-    #print(np.shape(review))
     return review
+
 
 def get_data(data_dirctory):
     train_data = []
@@ -105,16 +107,53 @@ def get_data(data_dirctory):
     #print(train_data.shape)
     return train_data, train_label
 
-def train_dataset():
+def train_dataset(file_name):
     start_time = time.time()
+
+    pos_train_data, pos_train_label = get_data(train_data_dir_pos)
+    neg_data,neg_label = get_data(train_data_dir_neg)
+    data = pos_train_data + neg_data
+    label = pos_train_label + neg_label
+
+    print(np.shape(data))
+    print(np.shape(label))
+    np.save("../data/"+file_name,data)
+    np.save("../data/"+file_name+"_label",label)
     
-    neg_train_data, neg_train_label = get_data(train_data_dir_neg)
-    #pos_train_data, pos_train_label = get_data(train_data_dir_pos)
-    print(np.shape(neg_train_data))
-    print(np.shape(neg_train_label))
+    #data = embedding_words(data)
+    #np.save("../data/"+file_name+"_embed",data)
+
     elapsed_time = time.time() - start_time
     print("It took {} to finish this shit".format(elapsed_time))
+    print("Saved the data into files")
 
-#get_review(train_data_dir_neg+"0_3.txt")
 
-#train_dataset()
+def test_dataset(file_name):
+    start_time = time.time()
+
+    pos_train_data, pos_train_label = get_data(test_data_dir_pos)
+    neg_data,neg_label = get_data(test_data_dir_neg)
+    data = pos_train_data + neg_data
+    label = pos_train_label + neg_label
+
+    print(np.shape(data))
+    print(np.shape(label))
+    np.save("../data/"+file_name,data)
+    np.save("../data/"+file_name+"_label",label)
+    
+    #data = embedding_words(data)
+    #np.save("../data/"+file_name+"_embed",data)
+
+    elapsed_time = time.time() - start_time
+    print("It took {} to finish this shit".format(elapsed_time))
+    print("Saved the data into files")
+
+
+
+train_dataset("train_data")
+train_dataset("test_data")
+
+#test_data = np.load("neg_train_data_embed.npy")
+#print(test_data.shape)
+#test_data = np.load("neg_train_data_embed.npy")
+#print(test_data.shape)
