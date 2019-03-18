@@ -68,7 +68,7 @@ def train():
     print(test_data.shape)
     history = model.fit(train_data,
                     train_labels,
-                    epochs=100,
+                    epochs=50,
                     batch_size=512,
                     validation_data=(x_val, y_val),
                     verbose=1)
