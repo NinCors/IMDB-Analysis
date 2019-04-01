@@ -2,7 +2,7 @@ import numpy as np
 import sys
 
 class ConvLayer(object):
-    def __init__(self, kernal_num,layer_num,  kernal_size, stride = 1, lr = 0.03, pd = 1, reg = 0.75):
+    def __init__(self, kernal_num,layer_num,kernal_size, stride = 1, lr = 0.03, pad = 1, reg = 0.75, m = 0.9):
         self.name = "Convolutional_layer"
         #initial the kernals with random values 
         self.conv_kernals = np.random.randn(kernal_num,layer_num,kernal_size,kernal_size)
@@ -14,21 +14,22 @@ class ConvLayer(object):
         self.lr = lr
         self.stride = stride
         self.reg = reg
-        self.pd = pd
+        self.pad = pad
+        self.m = m
         self.input = None
         
     def forward(self,input):
         self.input = input
         node_num, layer_num, h, w = input.shape
         kernal_num_k, layer_num_k, h_k, w_k = self.conv_kernals.shape
-        h_res = int ((2*self.pd + h - h_k) / self.stride) + 1
-        w_res = int ((2*self.pd + w - w_k) / self.stride) + 1
+        h_res = int ((2*self.pad + h - h_k) / self.stride) + 1
+        w_res = int ((2*self.pad + w - w_k) / self.stride) + 1
         res = np.zeros((node_num,kernal_num_k,h_res,w_res))
         #padding the input value with 0
-        input = np.pad(input,((0,), (0,), (self.pd,), (self.pd,)), mode='constant')
+        input = np.pad(input,((0,), (0,), (self.pad,), (self.pad,)), mode='constant')
         #Scan the input vector
-        for i in range(h):
-            for j in range(w):
+        for i in range(h_res):
+            for j in range(w_res):
                 scanned_area = input[:,:,i*self.stride:i*self.stride+h_k,j*self.stride:j*self.stride+w_k]
                 for k in range(kernal_num_k):
                     res[:,k,i,j] = np.sum(scanned_area*self.conv_kernals[k,:,:,:], axis=(1,2,3))
